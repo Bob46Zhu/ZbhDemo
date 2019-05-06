@@ -1,3 +1,50 @@
 <resources>
     <string name="app_name">测试专用</string>
+    <string name="input_please">请输入文件名：</string>
+    <string name="context">请输入内容：</string>
+    <string name="write">写入</string>
+    <string name="read">读取</string>
+    <string name="clean">清除</string>
+
+
+    <string name="hello_world">Hello world!</string>
+    <string name="action_settings">Settings</string>
+    <string name="long_press">长按我，加载菜单</string>
+    <string name="load_pic">请求图片</string>
+    <string name="load_html">请求HTML代码</string>
+    <string name="load_html_into">将HTML代码加载到WebView</string>
+    <string name="my">我的</string>
+    <string name="burn">烧录</string>
+
+    <string name="operation">1、使用微信打开烧录文件，请先将app退出再从微信打开。(QQ则不需要)  2、添加烧录文件后，插入前面板，点击烧录。</string>
+    <string name="open">打开</string>
+    <string name="textTest">测试dd专用文本分类问题： 给定文档p（可能含有标题t），将文档分类为n个类别中的一个或多个
+文本分类应用： 常见的有垃圾邮件识别，情感分析
+文本分类方向： 主要有二分类，多分类，多标签分类
+文本分类方法： 传统机器学习方法（贝叶斯，svm等），深度学习方法（fastText，TextCNN等）
+本文的思路： 本文主要介绍文本分类的处理过程，主要哪些方法。致力让读者明白在处理文本分类问题时应该从什么方向入手，重点关注什么问题，对于不同的场景应该采用什么方法。
+文本分类的处理大致分为文本预处理、文本特征提取、分类模型构建等。和英文文本处理分类相比，中文文本的预处理是关键技术。
+
+一、中文分词：
+
+针对中文文本分类时，很关键的一个技术就是中文分词。特征粒度为词粒度远远好于字粒度，其大部分分类算法不考虑词序信息，基于字粒度的损失了过多的n-gram信息。下面简单总结一下中文分词技术:基于字符串匹配的分词方法、基于理解的分词方法和基于统计的分词方法 [1]。
+
+1，基于字符串匹配的分词方法：
+过程：这是一种基于词典的中文分词，核心是首先建立统一的词典表，当需要对一个句子进行分词时，首先将句子拆分成多个部分，将每一个部分与字典一一对应，如果该词语在词典中，分词成功，否则继续拆分匹配直到成功。
+核心： 字典，切分规则和匹配顺序是核心。
+分析：优点是速度快，时间复杂度可以保持在O（n）,实现简单，效果尚可；但对歧义和未登录词处理效果不佳。
+
+2，基于理解的分词方法：基于理解的分词方法是通过让计算机模拟人对句子的理解，达到识别词的效果。其基本思想就是在分词的同时进行句法、语义分析，利用句法信息和语义信息来处理歧义现象。它通常包括三个部分：分词子系统、句法语义子系统、总控部分。在总控部分的协调下，分词子系统可以获得有关词、句子等的句法和语义信息来对分词歧义进行判断，即它模拟了人对句子的理解过程。这种分词方法需要使用大量的语言知识和信息。由于汉语语言知识的笼统、复杂性，难以将各种语言信息组织成机器可直接读取的形式，因此目前基于理解的分词系统还处在试验阶段。
+
+3，基于统计的分词方法：
+过程：统计学认为分词是一个概率最大化问题，即拆分句子，基于语料库，统计相邻的字组成的词语出现的概率，相邻的词出现的次数多，就出现的概率大，按照概率值进行分词，所以一个完整的语料库很重要。
+主要的统计模型有： N元文法模型（N-gram），隐马尔可夫模型（Hidden Markov Model ，HMM），最大熵模型（ME），条件随机场模型（Conditional Random Fields，CRF）等。
+---------------------
+作者：yealxxy
+来源：CSDN
+原文：https://blog.csdn.net/u014248127/article/details/80774668
+版权声明：本文为博主原创文章，转载请附上博文链接！</string>
+    <string name="shuoming">使用说明</string>
+
+
 </resources>
