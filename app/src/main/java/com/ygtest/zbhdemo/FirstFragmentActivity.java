@@ -3,9 +3,11 @@ package com.ygtest.zbhdemo;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.PendingIntent;
+import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.ContentUris;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.database.Cursor;
@@ -42,8 +44,11 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.PipedInputStream;
 import java.util.HashMap;
 import java.util.Iterator;
+
+import static android.content.Intent.ACTION_VIEW;
 
 /**
  * Created by Android Studio.
@@ -104,6 +109,9 @@ public class FirstFragmentActivity extends Fragment implements View.OnClickListe
     STM_DownloadThread stm_downloadThread = null;
     TI_DownloadThread ti_downloadThread = null;
 
+    //定义一个ProcessDialog
+    private ProgressDialog pDialog ;
+
 
     private Handler mHandler = new Handler() {
         public void handleMessage (Message msg) {
@@ -117,9 +125,14 @@ public class FirstFragmentActivity extends Fragment implements View.OnClickListe
                     break;
                 case 3:
                     tv_logText.append("文件大小："+byteLen+"\n");
+                    pDialog.setTitle("正在烧录...");
+                    pDialog.setMax(byteLen);
+                    pDialog.show();
+                    pDialog.setProgress(0);
                     break;
                 case 4:
                     tv_logText.append("\n烧录完成\n");
+                    pDialog.dismiss();
                     bt_burn.setEnabled(true);
                     bt_openfile.setEnabled(true);
                     mUsbConnection.close();
@@ -169,11 +182,44 @@ public class FirstFragmentActivity extends Fragment implements View.OnClickListe
 
         mUsbManager = (UsbManager) mContext.getSystemService(Context.USB_SERVICE);
         Usb_Start();
+
+        //进程对话框
+        pDialog = new ProgressDialog(mContext);
+        pDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+        pDialog.setTitle("正在烧录...");
+        //设置进程对话框点击对话框外不能取消
+        pDialog.setCanceledOnTouchOutside(false);
+        //设置进程对话框可以通过取消按扭取消
+        pDialog.setCancelable(true);
+        pDialog.setButton(DialogInterface.BUTTON_NEGATIVE, "取消", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+
+            }
+        });
+
+        /**
+         * 从另一个app中读取文件路径
+         */
+        Intent intent = getActivity().getIntent();
+        String action = intent.getAction();
+        if(ACTION_VIEW.equals(action)) {
+            Uri uri = intent.getData();
+            str_filepath = uri.getScheme();
+            Log.d("getScheme",str_filepath);
+            str_filepath = uri.getPath();
+            Log.d("getPath",str_filepath);
+            tv_filePath.setText(str_filepath);
+            showToast(str_filepath);
+        }
+
+
         /**
          * 注册两个广播信号，监听USB设备插入和拔出
          */
         IntentFilter usbFilter = new IntentFilter(ACTION_USB_ATTACHED);
         usbFilter.addAction(ACTION_USB_DETACHED);
+        usbFilter.addAction(ACTION_VIEW);
         getActivity().registerReceiver(mUsbReceiver,usbFilter);//USB拔出，注册广播
 
         /**
@@ -190,6 +236,25 @@ public class FirstFragmentActivity extends Fragment implements View.OnClickListe
 
 
         return view;
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        /**
+         * 从另一个app中读取文件路径
+         */
+        Intent intent = getActivity().getIntent();
+        String action = intent.getAction();
+        if(ACTION_VIEW.equals(action)) {
+            Uri uri = intent.getData();
+            str_filepath = uri.getScheme();
+            Log.d("getScheme",str_filepath);
+            str_filepath = uri.getPath();
+            Log.d("getPath",str_filepath);
+            tv_filePath.setText(str_filepath);
+            showToast(str_filepath);
+        }
     }
 
     private void Usb_Start() {
@@ -331,13 +396,25 @@ public class FirstFragmentActivity extends Fragment implements View.OnClickListe
                 burn_flag = false;
                 tv_logText.setText("请插入设备");
                 showToast("USB设备拔出");
+            }else if (action.equals(ACTION_VIEW)){
+                /**
+                 * 从另一个app中读取文件路径
+                 */
+                intent = getActivity().getIntent();
+                Uri uri = intent.getData();
+                str_filepath = uri.getScheme();
+                Log.d("getScheme",str_filepath);
+                str_filepath = uri.getPath();
+                Log.d("getPath",str_filepath);
+                tv_filePath.setText(str_filepath);
+                showToast(str_filepath);
             }
         }
     };
 
 
     /**
-     * 吐司
+     * 打印吐司
      * */
     public void showToast(String str){
         Toast.makeText(getActivity(), str, Toast.LENGTH_SHORT).show();
@@ -569,6 +646,7 @@ public class FirstFragmentActivity extends Fragment implements View.OnClickListe
                             readfilelen = fis.read(sendBuffer,0,2048);
                             // fis.mark(datapos);
                             // showToast("读取到文件大小为："+fis.read(sendBuffer));
+                            pDialog.incrementProgressBy(readfilelen);
                         } catch (IOException e) {
                             e.printStackTrace();
                         }
@@ -710,6 +788,7 @@ public class FirstFragmentActivity extends Fragment implements View.OnClickListe
                                 //mHandler.obtainMessage(2).sendToTarget();
                                 // readfilelen = fis.read(sendBuffer,0,1);
                                 readfilelen = fis.read(readBuffer);
+                                pDialog.incrementProgressBy(readfilelen);
                                 // fis.mark(datapos);
                                 // showToast("读取到文件大小为："+fis.read(sendBuffer));
                             } catch (IOException e) {
